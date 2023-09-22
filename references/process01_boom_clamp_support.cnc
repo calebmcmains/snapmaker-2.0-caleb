@@ -23,34 +23,20 @@
 ; -> Vendor      : Snapmaker
 ; -> Vendor URL  : http://www.snapmaker.com
 ; -> Description : Snapmaker 2.0 (Marlin)
-;Post-Processor
-; -> Author      : Nuno Vaz Oliveira
-; -> Version     : v20230108.1
-; -> Description : Milling post for Snapmaker 2.0v20230108.1, created by Nuno Vaz Oliveira
 ;Estiamted Machining Time
 ; -> 0h  7min  45sec     : Operation 01_Parallel
 ; -> 0h  7min  45sec     : Total
 
-;Set units to millimeters
 G21
-;Set working units as absolute positioning system
 G90
-
-;Parameter "operation:tool_clockwise" read successfully with a value of CW
-;Parameter "operation:retractHeight_value" read successfully with a value of 5
-
-;Operation name: 01_Parallel
-;Raize Z axis to safe position
 G0 Z15.000
-;Set tool speed to 12000RPM, or 100% in CW direction
 M3 P100
-;Dwell for 2 seconds to allow the spindle to spin up
 G4 S2
 G0 X5.670 Y5.001 Z15.000
 G1 X5.670 Y5.001 Z15.000 F300
 G1 X5.670 Y5.001 Z1.876
-G1 X5.670 Y5.001 Z0.117 F250
-G1 X5.678 Y5.001 Z0.046 F300
+G1 X5.670 Y5.001 Z0.117
+G1 X5.678 Y5.001 Z0.046
 G1 X5.701 Y5.001 Z-0.021
 G1 X5.739 Y5.001 Z-0.081
 G1 X5.789 Y5.001 Z-0.131
@@ -5943,8 +5929,8 @@ G1 X38.759 Y67.747 Z0.292
 G1 X38.759 Y67.747 Z5.000
 G1 X6.032 Y5.757 Z5.000
 G1 X6.032 Y5.757 Z1.992
-G1 X6.032 Y5.757 Z0.287 F250
-G1 X6.025 Y5.757 Z0.223 F300
+G1 X6.032 Y5.757 Z0.287
+G1 X6.025 Y5.757 Z0.223
 G1 X6.006 Y5.757 Z0.162
 G1 X5.975 Y5.757 Z0.106
 G1 X5.933 Y5.757 Z0.057
@@ -11748,8 +11734,8 @@ G1 X32.450 Y68.251 Z0.116
 G1 X32.450 Y68.251 Z5.000
 G1 X79.170 Y5.001 Z5.000
 G1 X79.170 Y5.001 Z1.876
-G1 X79.170 Y5.001 Z0.117 F250
-G1 X79.178 Y5.001 Z0.046 F300
+G1 X79.170 Y5.001 Z0.117
+G1 X79.178 Y5.001 Z0.046
 G1 X79.201 Y5.001 Z-0.021
 G1 X79.239 Y5.001 Z-0.081
 G1 X79.289 Y5.001 Z-0.131
@@ -17670,8 +17656,8 @@ G1 X112.260 Y67.747 Z0.292
 G1 X112.260 Y67.747 Z5.000
 G1 X79.532 Y5.757 Z5.000
 G1 X79.532 Y5.757 Z1.992
-G1 X79.532 Y5.757 Z0.287 F250
-G1 X79.525 Y5.757 Z0.223 F300
+G1 X79.532 Y5.757 Z0.287
+G1 X79.525 Y5.757 Z0.223
 G1 X79.506 Y5.757 Z0.162
 G1 X79.475 Y5.757 Z0.106
 G1 X79.433 Y5.757 Z0.057
@@ -23487,12 +23473,7 @@ G1 X105.976 Y68.251 Z-0.010
 G1 X105.956 Y68.251 Z0.052
 G1 X105.950 Y68.251 Z0.116
 G1 X105.950 Y68.251 Z15.000
-
-;Wait for moves to finish before running next instruction
 M400
-;Stopping spindle
 M5
-;Dwell for 3 seconds to allow the spindle to spin down
 G4 S3
-;Move Z axis 334mm to top of machine to get it out of the way
 G0 Z334.000
