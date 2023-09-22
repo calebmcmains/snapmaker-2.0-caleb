@@ -104,7 +104,7 @@ CALEB-EDITS IS Caleb McMains CHANGES TO TRY AND SOLVE A FEW ISSUE HE WAS HAVING
 {
     POST_VERSION                       = "v20230108.1";
     AUTHOR_NAME                        = "Nuno Vaz Oliveira";
-    CONTRIBUTOR_NAME                   = "Caleb McMains"
+    CONTRIBUTOR_NAME                   = "Caleb McMains" // [ADDED THIS ONLY SO I COULD DISTINGUISH WHICH POST PROCESS WAS MY EDITS]
 }
 
 // User configuration. Please change only these values on this file
@@ -124,7 +124,7 @@ CALEB-EDITS IS Caleb McMains CHANGES TO TRY AND SOLVE A FEW ISSUE HE WAS HAVING
     allowHelicalMoves                  = true;                                                             // Supported by Snapmaker 2.0
     capabilities                       = CAPABILITY_MILLING;                                               // All that Snapmaker 2.0 can handle
     certificationLevel                 = 2;                                                                // As recommended on Autodesk Post Processor Training Guide
-    description                        = "Snapmaker 2.0 (Marlin) by " + AUTHOR_NAME;                       // Shows up on Fusion 360 post window
+    description                        = "Snapmaker 2.0 (Marlin) by " + AUTHOR_NAME + " featuring contributions from " + CONTRIBUTOR_NAME;                       // Shows up on Fusion 360 post window, [CHANGED THIS ONLY SO I COULD DISTINGUISH WHICH POST PROCESS WAS MY EDITS]
     extension                          = ".cnc";                                                           // As exported by Luban
     setCodePage("ascii");                                                                                  // As recommended on Autodesk Post Processor Training Guide
     highFeedrate                       = 6000;                                                             // Specifies the high feed mapping mode for rapid moves
@@ -317,6 +317,9 @@ groupDefinitions = {
 
     // This variable will track the last Z position
     var lastPositionZ                  = 9999;
+
+    // This variable allows for tracting the previousFeedRate in the OnLinear function to decide when to write the feed rate and when not to
+    var previousFeedRate;
 }
 
 // The writeBlock function writes a block of codes to the output NC file. It will add a sequence number to the block,
@@ -921,7 +924,14 @@ function onLinear(_x, _y, _z, feed) {
                     lastPositionZ = z;
                 }
                 // Normal case. Use feed rate specified and output next block
+                // outputs the feed rate only if it changes, this helps for a cleaner code. 
+                // Snapmakers G-code reference indicates that: "The feedrate set here applies to subsequent moves that omit this parameter."
+                // therefore feedrate only needs to be written to set it.
+                if (previousFeedRate === f) {
+                writeBlock(gMotionModal.format(1), x, y, z);
+                } else {
                 writeBlock(gMotionModal.format(1), x, y, z, f);
+                }
             }
         }
     } else if (f) {
@@ -934,6 +944,7 @@ function onLinear(_x, _y, _z, feed) {
         }
     }
 
+    previousFeedRate = f;
 }
 
 // The onRapid5D function handles rapid positioning moves (G00) in multi-axis operations. The tool position is
@@ -1119,8 +1130,8 @@ function onClose() {
     // output next block
     writeBlock("G4 S" + DWELL_TIME_SPIN_DOWN);
 
-    // Not sure if this a good IDea becuase I think it sends the z axis beyond the physical limitations
-    // of the machine
+    // Not sure if this a good idea becuase I think it sends the z axis beyond the physical limitations
+    // of the machine. Also not sure if once the file is complete does the machine defaults take over and automatically send the machine to HOME position?
     if (prop_writeExtraComments) writeComment(localize("Move Z axis " + ACTION_PAUSE_RAISE_Z_POSITION + "mm to top of machine to get it out of the way"));
     writeBlock(gFormat.format(0), zOutput.format(ACTION_PAUSE_RAISE_Z_POSITION));
 
