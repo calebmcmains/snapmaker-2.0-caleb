@@ -319,7 +319,7 @@ groupDefinitions = {
     var lastPositionZ                  = 9999;
 
     // This variable allows for tracting the previousFeedRate in the OnLinear function to decide when to write the feed rate and when not to
-    var previousFeedRate;
+    // var previousFeedRate;
 }
 
 // The writeBlock function writes a block of codes to the output NC file. It will add a sequence number to the block,
@@ -366,6 +366,25 @@ function onComment(message) {
         }
     }
 
+}
+
+// This function returns the min(z) for entire setup when there is multiple operations(i.e sections)
+function findMinZ() {
+    var sectionsBottomHeight = [];
+
+    function compareHeights(a,b) {
+        return a-b;
+    }
+
+    for (var i = 0; i < getNumberOfSections(); ++i) {
+        var section = getSection(i);
+        var sectionBottomHeight = section.getParameter("operation:bottomHeight_value");
+        sectionsBottomHeight.push(sectionBottomHeight);
+    }
+
+    sectionsBottomHeight.sort(compareHeights);
+
+    return sectionsBottomHeight[0];
 }
 
 
@@ -463,7 +482,7 @@ function writeSnapmakerHeader() {
     writeComment(localize("min_x(mm): " + getGlobalParameter("operation:surfaceXLow")));
     writeComment(localize("min_y(mm): " + getGlobalParameter("operation:surfaceYLow")));
     writeComment(localize("min_b(mm): " + "0"));
-    writeComment(localize("min_z(mm): " + getGlobalParameter("operation:bottomHeight_value")));
+    writeComment(localize("min_z(mm): " + findMinZ()));
 
     // Writes the feedrate for the tool and the machining when carving
     if (hasGlobalParameter("operation:tool_feedCutting")) {
@@ -927,11 +946,11 @@ function onLinear(_x, _y, _z, feed) {
                 // outputs the feed rate only if it changes, this helps for a cleaner code. 
                 // Snapmakers G-code reference indicates that: "The feedrate set here applies to subsequent moves that omit this parameter."
                 // therefore feedrate only needs to be written to set it.
-                if (previousFeedRate === f) {
-                writeBlock(gMotionModal.format(1), x, y, z);
-                } else {
+                // if (previousFeedRate === f) {
+                // writeBlock(gMotionModal.format(1), x, y, z);
+                // } else {
                 writeBlock(gMotionModal.format(1), x, y, z, f);
-                }
+                // }
             }
         }
     } else if (f) {
@@ -944,7 +963,7 @@ function onLinear(_x, _y, _z, feed) {
         }
     }
 
-    previousFeedRate = f;
+    // previousFeedRate = f;
 }
 
 // The onRapid5D function handles rapid positioning moves (G00) in multi-axis operations. The tool position is
