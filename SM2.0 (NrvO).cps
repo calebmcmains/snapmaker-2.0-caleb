@@ -647,6 +647,9 @@ function onSection() {                                         // Start of an op
                 writeComment("Operation name: " + comment);
             }
         }
+        if (hasParameter("operation:tool_description")) {
+            writeComment(localize("Tool name:") + getParameter("operation:tool_description"));
+        }
     }
 
     // tool change not supported
