@@ -115,7 +115,7 @@ CALEB-EDITS IS Caleb McMains CHANGES TO TRY AND SOLVE A FEW ISSUE HE WAS HAVING
     DWELL_TIME_SPIN_DOWN               = "3";                  // Dwell time for spin down in seconds. Used immediately after spindle stop
     PAUSE_RAISE_Z_FEED_RATE_UP         = 3000;                 // Feed rate to raise Z axis on ACTION_PAUSE_RAISE_Z command
     PAUSE_RAISE_Z_FEED_RATE_DOWN       = 1500;                 // Feed rate to return Z axis to position after ACTION_PAUSE_RAISE_Z command
-    ACTION_PAUSE_RAISE_Z_POSITION      = 334;                  // Position of Z axis for pause and other actions to send Z as far up as possible
+    ACTION_PAUSE_RAISE_Z_POSITION      = 100;                  // Position of Z axis for pause and other actions to send Z as far up as possible
 }
 
 // Fusion 360 Kernel Settings
@@ -317,9 +317,6 @@ groupDefinitions = {
 
     // This variable will track the last Z position
     var lastPositionZ                  = 9999;
-
-    // This variable allows for tracting the previousFeedRate in the OnLinear function to decide when to write the feed rate and when not to
-    // var previousFeedRate;
 }
 
 // The writeBlock function writes a block of codes to the output NC file. It will add a sequence number to the block,
@@ -448,7 +445,6 @@ function convertSeconds(userSeconds) {
 
     const timeData = {totalSeconds: totalSeconds, totalMinutes: totalMinutes, hours: hours, minutes: minutes, seconds: seconds}
     
-
     return timeData;
   }
 
@@ -468,7 +464,10 @@ function writeSnapmakerHeader() {
     writeComment(localize("tool_head: standardCNCToolheadForSM2"));
 
     // Writes the machine model if it exists
-    machineConfiguration.getModel() ? writeComment(localize("machine: ") + machineConfiguration.getModel()) : writeComment(localize("machine: "));
+    machineConfiguration.getModel() ? writeComment(localize("machine: ") + machineConfiguration.getModel()) : writeComment(localize("machine: Snapmaker 2.0 A350"));
+
+    // G-code Flavor
+    writeComment(localize("gcode_flavor: marlin"));
 
     // Writes the estimated time in seconds for the whole process
     writeComment(localize("estimated_time(s): " + convertSeconds(totalMachingingTime().totalCycleTime).totalSeconds));
@@ -500,7 +499,7 @@ function writeSnapmakerHeader() {
     
     // Hard coded in to match the work size of the Snapmaker A350T
     writeComment(localize("work_size_x: " + "320"));
-    writeComment(localize("work_size_x: " + "350"));
+    writeComment(localize("work_size_y: " + "350"));
 
 
     //starts snapmaker header
@@ -550,8 +549,6 @@ function onOpen() {
         writeln("");
     }
     
-
-
     // Write program info
     if (prop_writeProgram) {
         writeComment(localize("Program"));
@@ -598,10 +595,8 @@ function onOpen() {
     if(prop_writeMachiningTimes) {
         writeComment(localize("Estiamted Machining Time"));
         for (var i = 0; i < totalMachingingTime().sectionCycleTimes.length; i++ ) {
-            // writeComment(localize(" -> Operation " + totalMachingingTime().sectionCycleTimes[i].operation + "           : " + convertSeconds(totalMachingingTime().sectionCycleTimes[i].cycleTime).hours + " h  ") + convertSeconds(totalMachingingTime().sectionCycleTimes[i].cycleTime).minutes + " min  " + convertSeconds(totalMachingingTime().sectionCycleTimes[i].cycleTime).seconds + " sec");
             writeComment(localize(" -> " + convertSeconds(totalMachingingTime().sectionCycleTimes[i].cycleTime).hours + "h  ") + convertSeconds(totalMachingingTime().sectionCycleTimes[i].cycleTime).minutes + "min  " + convertSeconds(totalMachingingTime().sectionCycleTimes[i].cycleTime).seconds + "sec" + "     : " + "Operation " + totalMachingingTime().sectionCycleTimes[i].operation); 
         }
-        // writeComment(localize(" -> Total" + "           : " + convertSeconds(totalMachingingTime().totalCycleTime).hours + " h  ") + convertSeconds(totalMachingingTime().totalCycleTime).minutes + " min  " + convertSeconds(totalMachingingTime().totalCycleTime).seconds + " sec");
         writeComment(localize(" -> " + convertSeconds(totalMachingingTime().totalCycleTime).hours + "h  ") + convertSeconds(totalMachingingTime().totalCycleTime).minutes + "min  " + convertSeconds(totalMachingingTime().totalCycleTime).seconds + "sec" + "     : " + "Total");
         writeln("");
     }
@@ -638,6 +633,8 @@ function onOpen() {
 //   4. Work plane
 //   5. Initial position
 function onSection() {                                         // Start of an operation
+    // specifies that the tool has been retracted to the safe plane
+    var retracted = false;
 
     // Separates this line from the read parameters from the onParameter() function
     if (prop_writeExtraComments) writeln("");
@@ -652,8 +649,7 @@ function onSection() {                                         // Start of an op
         }
     }
 
-    // specifies that the tool has been retracted to the safe plane
-    var retracted = false;
+    // tool change not supported
 
     // Forces the output of the linear axes (X, Y, Z) on the next motion block
     forceXYZ();
@@ -665,6 +661,8 @@ function onSection() {                                         // Start of an op
         return;
     }
     setRotation(remaining);
+
+    // coolant not supported
 
     // Forces output on all axes and feedrate on the next motion block
     forceAny();
@@ -943,14 +941,7 @@ function onLinear(_x, _y, _z, feed) {
                     lastPositionZ = z;
                 }
                 // Normal case. Use feed rate specified and output next block
-                // outputs the feed rate only if it changes, this helps for a cleaner code. 
-                // Snapmakers G-code reference indicates that: "The feedrate set here applies to subsequent moves that omit this parameter."
-                // therefore feedrate only needs to be written to set it.
-                // if (previousFeedRate === f) {
-                // writeBlock(gMotionModal.format(1), x, y, z);
-                // } else {
                 writeBlock(gMotionModal.format(1), x, y, z, f);
-                // }
             }
         }
     } else if (f) {
