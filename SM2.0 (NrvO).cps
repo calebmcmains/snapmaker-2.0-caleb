@@ -644,11 +644,11 @@ function onSection() {                                         // Start of an op
         if (hasParameter("operation-comment")) {
             var comment = getParameter("operation-comment");
             if (comment) {
-                writeComment("Operation name: " + comment);
+                writeComment(localize("Operation name: " + comment));
             }
         }
         if (hasParameter("operation:tool_description")) {
-            writeComment(localize("Tool name:") + getParameter("operation:tool_description"));
+            writeComment(localize("Tool name: ") + getParameter("operation:tool_description"));
         }
     }
 
