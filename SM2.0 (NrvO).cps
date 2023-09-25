@@ -206,7 +206,7 @@ properties = {
         group                          : "rapidSection",
         type                           : "integer",
         range                          : [ 1000 , 7000 ],
-        value                          : 6000,
+        value                          : 2000,
         scope                          : "post"
     },
     feedRateMode                       : {
@@ -219,7 +219,7 @@ properties = {
             { title                    : "1 -> Use custom feed rate",        id:"1"},
             { title                    : "2 -> Replace G1 with G0",          id:"2"}
         ],
-        value                          : "0",
+        value                          : "1",
         scope                          : "post"
     },
     writeMachine                       : {
@@ -317,6 +317,8 @@ groupDefinitions = {
 
     // This variable will track the last Z position
     var lastPositionZ                  = 9999;
+
+    var linesOfCode                    = 0;
 }
 
 // The writeBlock function writes a block of codes to the output NC file. It will add a sequence number to the block,
@@ -325,6 +327,7 @@ groupDefinitions = {
 // The code list is separated by commas, so that each code is passed as an individual argument, which allows for the
 // codes to be separated by the word separator defined by the setWordSeparator function.
 function writeBlock() {
+    linesOfCode += 1;
     if (prop_showSequenceNumbers) {
         writeWords2("N" + sequenceNumber, arguments);
         sequenceNumber += prop_sequenceNumberIncrement;
@@ -342,6 +345,7 @@ function formatComment(text) {
 
 // The writeComment function is defined in the post processor and is used to output comments to the output NC file.
 function writeComment(text) {
+    linesOfCode += 1;
     writeln(formatComment(text));
 }
 
@@ -468,6 +472,7 @@ function writeSnapmakerHeader() {
 
     // G-code Flavor
     writeComment(localize("gcode_flavor: marlin"));
+    writeComment(localize("file_total_lines: "));
 
     // Writes the estimated time in seconds for the whole process
     writeComment(localize("estimated_time(s): " + convertSeconds(totalMachingingTime().totalCycleTime).totalSeconds));
@@ -492,9 +497,9 @@ function writeSnapmakerHeader() {
     
     // Writes the feedrate for the tool and the machining when not carving
     if (hasGlobalParameter("operation:tool_surfaceSpeed")) {
-        writeComment(localize("jog_speed(mm/minute): " + getGlobalParameter("operation:tool_surfaceSpeed").toFixed(0)))
+        writeComment(localize("jog_speed(mm/minute): " + getProperty("retractFeedRate")));
     } else {
-        writeComment(localize("wjog_speed(mm/minute): unknown"));
+        writeComment(localize("jog_speed(mm/minute): unknown"));
     }
     
     // Hard coded in to match the work size of the Snapmaker A350T
@@ -680,7 +685,7 @@ function onSection() {                                         // Start of an op
             // Save last Z position (Added by me)
             lastPositionZ = zOutput.format(initialPosition.z);
             // Move to starting position
-            if (prop_writeExtraComments) writeComment(localize("Raize Z axis to safe position"));
+            if (prop_writeExtraComments) writeComment(localize("Raise Z axis to safe position"));
             writeBlock(gMotionModal.format(0), zOutput.format(initialPosition.z));
         }
     }
