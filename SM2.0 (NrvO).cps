@@ -317,8 +317,6 @@ groupDefinitions = {
 
     // This variable will track the last Z position
     var lastPositionZ                  = 9999;
-
-    var linesOfCode                    = 0;
 }
 
 // The writeBlock function writes a block of codes to the output NC file. It will add a sequence number to the block,
@@ -327,7 +325,6 @@ groupDefinitions = {
 // The code list is separated by commas, so that each code is passed as an individual argument, which allows for the
 // codes to be separated by the word separator defined by the setWordSeparator function.
 function writeBlock() {
-    linesOfCode += 1;
     if (prop_showSequenceNumbers) {
         writeWords2("N" + sequenceNumber, arguments);
         sequenceNumber += prop_sequenceNumberIncrement;
@@ -345,7 +342,6 @@ function formatComment(text) {
 
 // The writeComment function is defined in the post processor and is used to output comments to the output NC file.
 function writeComment(text) {
-    linesOfCode += 1;
     writeln(formatComment(text));
 }
 
