@@ -104,6 +104,7 @@ CALEB-EDITS IS Caleb McMains CHANGES TO TRY AND SOLVE A FEW ISSUE HE WAS HAVING
 {
     POST_VERSION                       = "v20230108.1";
     AUTHOR_NAME                        = "Nuno Vaz Oliveira";
+    CONTRIBUTOR_NAME                   = "Caleb McMains";       // [ADDED THIS ONLY SO I COULD DISTINGUISH WHICH POST PROCESS WAS MY EDITS]
 }
 
 // User configuration. Please change only these values on this file
@@ -114,33 +115,50 @@ CALEB-EDITS IS Caleb McMains CHANGES TO TRY AND SOLVE A FEW ISSUE HE WAS HAVING
     DWELL_TIME_SPIN_DOWN               = "3";                  // Dwell time for spin down in seconds. Used immediately after spindle stop
     PAUSE_RAISE_Z_FEED_RATE_UP         = 3000;                 // Feed rate to raise Z axis on ACTION_PAUSE_RAISE_Z command
     PAUSE_RAISE_Z_FEED_RATE_DOWN       = 1500;                 // Feed rate to return Z axis to position after ACTION_PAUSE_RAISE_Z command
+    ACTION_PAUSE_RAISE_Z_POSITION      = 100;                  // Position of Z axis for pause and other actions to send Z as far up as possible
 }
 
 // Fusion 360 Kernel Settings
 {
-    allowedCircularPlanes              = 0;                                                                // Not supported by Snapmaker 2.0
-    allowHelicalMoves                  = true;                                                             // Supported by Snapmaker 2.0
-    capabilities                       = CAPABILITY_MILLING;                                               // All that Snapmaker 2.0 can handle
-    certificationLevel                 = 2;                                                                // As recommended on Autodesk Post Processor Training Guide
-    description                        = "Snapmaker 2.0 (Marlin) by " + AUTHOR_NAME;                       // Shows up on Fusion 360 post window
-    extension                          = ".cnc";                                                           // As exported by Luban
-    setCodePage("ascii");                                                                                  // As recommended on Autodesk Post Processor Training Guide
-    highFeedrate                       = 6000;                                                             // Specifies the high feed mapping mode for rapid moves
-    legal                              = "Copyright (C) 2022 " + AUTHOR_NAME;
-    longDescription                    = "Milling post for Snapmaker 2.0" + POST_VERSION + ", created by " + AUTHOR_NAME;
-    maximumCircularRadius              = spatial(1000, MM);                                                // As recommended on Autodesk Post Processor Training Guide
-    maximumCircularSweep               = toRad(180);                                                       // As recommended on Autodesk Post Processor Training Guide
-    minimumCircularSweep               = toRad(0.01);                                                      // As recommended on Autodesk Post Processor Training Guide
-    minimumChordLength                 = spatial(0.01, MM);                                                // As recommended on Autodesk Post Processor Training Guide
-    minimumCircularRadius              = spatial(0.01, MM);                                                // As recommended on Autodesk Post Processor Training Guide
-    minimumRevision                    = 24000;                                                            // As recommended on Autodesk Post Processor Training Guide
-    tolerance                          = spatial(0.002, MM);                                               // As recommended on Autodesk Post Processor Training Guide
-    vendor                             = "Snapmaker";                                                      // Shows up on Fusion 360 post window
+    allowedCircularPlanes              = 0;                                                                                                                                         // Not supported by Snapmaker 2.0
+    allowHelicalMoves                  = true;                                                                                                                                      // Supported by Snapmaker 2.0
+    capabilities                       = CAPABILITY_MILLING;                                                                                                                        // All that Snapmaker 2.0 can handle
+    certificationLevel                 = 2;                                                                                                                                         // As recommended on Autodesk Post Processor Training Guide
+    description                        = "Snapmaker 2.0 (Marlin) by " + AUTHOR_NAME + " featuring contributions from " + CONTRIBUTOR_NAME;                                          // Shows up on Fusion 360 post window, [CHANGED THIS ONLY SO I COULD DISTINGUISH WHICH POST PROCESS WAS MY EDITS]
+    extension                          = ".cnc";                                                                                                                                    // As exported by Luban
+    setCodePage("ascii");                                                                                                                                                           // As recommended on Autodesk Post Processor Training Guide
+    highFeedrate                       = 6000;                                                                                                                                      // Specifies the high feed mapping mode for rapid moves
+    legal                              = "Copyright (C) 2022 " + AUTHOR_NAME + " featuring contributions from " + CONTRIBUTOR_NAME;
+    longDescription                    = "Milling post for Snapmaker 2.0" + POST_VERSION + ", created by " + AUTHOR_NAME + " featuring contributions from " + CONTRIBUTOR_NAME;
+    maximumCircularRadius              = spatial(1000, MM);                                                                                                                         // As recommended on Autodesk Post Processor Training Guide
+    maximumCircularSweep               = toRad(180);                                                                                                                                // As recommended on Autodesk Post Processor Training Guide
+    minimumCircularSweep               = toRad(0.01);                                                                                                                               // As recommended on Autodesk Post Processor Training Guide
+    minimumChordLength                 = spatial(0.01, MM);                                                                                                                         // As recommended on Autodesk Post Processor Training Guide
+    minimumCircularRadius              = spatial(0.01, MM);                                                                                                                         // As recommended on Autodesk Post Processor Training Guide
+    minimumRevision                    = 24000;                                                                                                                                     // As recommended on Autodesk Post Processor Training Guide
+    tolerance                          = spatial(0.002, MM);                                                                                                                        // As recommended on Autodesk Post Processor Training Guide
+    vendor                             = "Snapmaker";                                                                                                                               // Shows up on Fusion 360 post window
     vendorUrl                          = "http://www.snapmaker.com";
 }
 
 // Properties that are changeable on Fusion 360 post process page. New improved version with tooltips and proper writing
 properties = {
+    writeSnapmakerHeader                        : {
+        title                          : "Write snapmaker header",
+        description                    : "Outputs a complete header as comments that Snapmaker Luban Software reads",
+        group                          : "informationSection",
+        type                           : "boolean",
+        value                          : true,
+        scope                          : "post"
+    },
+    writeMachiningTimes                : {
+        title                          : "Write machining times",
+        description                    : "Outputs a estimated amount of time for the whole machining process",
+        group                          : "informationSection",
+        type                           : "boolean",
+        value                          : true,
+        scope                          : "post"
+    },
     writeWarnings                      : {
         title                          : "Write warnings as comments",
         description                    : "Output comments with warnings for unsupported and ignored functions.",
@@ -188,7 +206,7 @@ properties = {
         group                          : "rapidSection",
         type                           : "integer",
         range                          : [ 1000 , 7000 ],
-        value                          : 6000,
+        value                          : 2000,
         scope                          : "post"
     },
     feedRateMode                       : {
@@ -201,7 +219,7 @@ properties = {
             { title                    : "1 -> Use custom feed rate",        id:"1"},
             { title                    : "2 -> Replace G1 with G0",          id:"2"}
         ],
-        value                          : "0",
+        value                          : "1",
         scope                          : "post"
     },
     writeMachine                       : {
@@ -299,6 +317,12 @@ groupDefinitions = {
 
     // This variable will track the last Z position
     var lastPositionZ                  = 9999;
+
+    // -------------------------------------------------------------------------------------------------------------------------------------------------
+    // This variable is a line counter to insert into the final output file, this allows snapmaker to estimate
+    // remaining completion time
+    // var outputLines = []; // buffer all G-code lines
+    // -------------------------------------------------------------------------------------------------------------------------------------------------
 }
 
 // The writeBlock function writes a block of codes to the output NC file. It will add a sequence number to the block,
@@ -315,16 +339,53 @@ function writeBlock() {
     }
 }
 
+// -------------------------------------------------------------------------------------------------------------------------------------------------
+// function writeBlock() {
+//     var line = "";
+
+//     if (prop_showSequenceNumbers) {
+//         line = "N" + sequenceNumber + " " + formatWords(arguments);
+//         sequenceNumber += prop_sequenceNumberIncrement;
+//     } else {
+//         line = formatWords(arguments);
+//     }
+
+//     outputLines.push(line); // buffer the line
+// }
+// -------------------------------------------------------------------------------------------------------------------------------------------------
+
 // formatComment is used to format comments. The formatComment function will remove any characters in the comment
 // that are not allowed, and add any characters that are mandatory. For Snapmakers, a semi-colon at the beginning.
 function formatComment(text) {
-    return ";" + String(text).replace(/[\(\)]/g, ""); // TODO: Need to double check if ( and ) are bad for comments
+    // return ";" + String(text).replace(/[\(\)]/g, ""); // TODO: Need to double check if ( and ) are bad for comments
+    return ";" + String(text) // TODO: Need to double check if ( and ) are bad for comments <---I dont think they are cause snapmaker uses them in comments
 }
 
 // The writeComment function is defined in the post processor and is used to output comments to the output NC file.
 function writeComment(text) {
     writeln(formatComment(text));
 }
+// -------------------------------------------------------------------------------------------------------------------------------------------------
+// function writeComment(text) {
+//     outputLines.push(formatComment(text)); // buffer comment
+// }
+
+// Writes everything????
+// function writeAllOutput() {
+//     // Calculate total lines
+//     var totalLines = outputLines.length;
+
+//     // Replace placeholder in header
+//     for (var i = 0; i < outputLines.length; i++) {
+//         outputLines[i] = outputLines[i].replace("LINE_COUNT_PLACEHOLDER", totalLines);
+//     }
+
+//     // Write all lines to the output file
+//     for (var i = 0; i < outputLines.length; i++) {
+//         writeln(outputLines[i]);
+//     }
+// }
+// -------------------------------------------------------------------------------------------------------------------------------------------------
 
 // The onComment function is called when the Manual NC command Comment is issued.
 // It will format and output the text of the comment to the NC file.
@@ -346,6 +407,151 @@ function onComment(message) {
 
 }
 
+// This function returns the min(z) for entire setup when there is multiple operations(i.e sections)
+function findMinZ() {
+    var sectionsBottomHeight = [];
+
+    function compareHeights(a,b) {
+        return a-b;
+    }
+
+    for (var i = 0; i < getNumberOfSections(); ++i) {
+        var section = getSection(i);
+        var sectionBottomHeight = section.getParameter("operation:bottomHeight_value");
+        sectionsBottomHeight.push(sectionBottomHeight);
+    }
+
+    sectionsBottomHeight.sort(compareHeights);
+
+    return sectionsBottomHeight[0];
+}
+
+
+// The totalMachingTime function is a custom function to determine the machining time per operation
+// and the total machining time for all operations to be done.
+// The function outputs and object containing the total time and an array of cycle times for each operation.
+// This function can be used anywhere in the file.
+function totalMachingingTime() {
+    var cycleTime = 0;
+    var currentTool;
+    var toolChangeTime = 0; // the time in seconds for a tool change
+    var sectionCycleTimes = [];
+
+    for (var i = 0; i < getNumberOfSections(); ++i) {
+        var section = getSection(i);
+        var tool = section.getTool();
+        if (currentTool != tool.number) {
+            currentTool = tool.number;
+            cycleTime += toolChangeTime;
+        }
+        cycleTime += section.getCycleTime();
+        var comment;
+        if (section.hasParameter("operation-comment")) {
+            comment = section.getParameter("operation-comment");
+        }
+        sectionCycleTimes.push({operation:comment, cycleTime:section.getCycleTime()});
+    }
+
+    var cycleTimeData = {totalCycleTime:cycleTime, sectionCycleTimes:sectionCycleTimes}
+    
+    return cycleTimeData;
+}
+
+// The convertSeconds function takes in cycle times as seconds and outputs and object containing 
+// different ways for the time to be displayed (i.e.: total seconds, total minutes, hours, minutes, and seconds).
+// this function can be used anywhere in the file.
+function convertSeconds(userSeconds) {
+    const userSecondsNum = parseInt(userSeconds, 10);
+    const totalSeconds =
+      userSecondsNum < 9
+        ? userSecondsNum.toString()
+        : userSecondsNum.toString();
+    const totalMinutes =
+      (userSecondsNum / 60).toFixed(2) < 9
+        ? (userSecondsNum / 60).toFixed(2).toString()
+        : (userSecondsNum / 60).toFixed(2).toString();
+    const hours =
+      Math.floor(userSecondsNum / 3600) < 9
+        ? Math.floor(userSecondsNum / 3600)
+            .toString()
+        : Math.floor(userSecondsNum / 3600);
+    const minutes =
+      Math.floor((userSecondsNum / 60) % 60) < 9
+        ? Math.floor((userSecondsNum / 60) % 60)
+            .toString()
+        : Math.floor((userSecondsNum / 60) % 60).toString();
+    const seconds =
+      userSecondsNum % 60 < 9
+        ? (userSecondsNum % 60).toString()
+        : userSecondsNum % 60;
+
+    const timeData = {totalSeconds: totalSeconds, totalMinutes: totalMinutes, hours: hours, minutes: minutes, seconds: seconds}
+    
+    return timeData;
+  }
+
+
+// The writeSnapmakerHeader function outputs a header section modeled after a NC file that is made
+// from Snapmaker Lubans software.
+// This specifically helps when uploading NC files to luban to send it to the machine and the machine
+// having access to certain information in the header.
+function writeSnapmakerHeader() {
+    // Starts snapmaker header
+    writeComment(localize("Header Start"));
+
+    // Defines type <-- could be changes to a property where you can select cnc, 3d printing, or laser
+    writeComment(localize("header_type: cnc"));
+
+    // Toolhead 
+    writeComment(localize("tool_head: standardCNCToolheadForSM2"));
+
+    // Writes the machine model if it exists
+    machineConfiguration.getModel() ? writeComment(localize("machine: ") + machineConfiguration.getModel()) : writeComment(localize("machine: Snapmaker 2.0 A350"));
+
+    // G-code Flavor
+    writeComment(localize("gcode_flavor: marlin"));
+
+    // Placeholder for total lines, will be replaced later
+    writeComment(localize("file_total_lines: LINE_COUNT_PLACEHOLDER"));
+
+    // Writes the estimated time in seconds for the whole process
+    writeComment(localize("estimated_time(s): " + convertSeconds(totalMachingingTime().totalCycleTime).totalSeconds));
+
+    // Writes coordinates min and maxs, I assume this is for creating the boundry box for running the boundry
+    // on the snapmaker machine
+    writeComment(localize("max_x(mm): " + getGlobalParameter("operation:surfaceXHigh")));
+    writeComment(localize("max_y(mm): " + getGlobalParameter("operation:surfaceYHigh")));
+    writeComment(localize("max_z(mm): " + ACTION_PAUSE_RAISE_Z_POSITION));
+    writeComment(localize("max_b(mm): " + "0"));
+    writeComment(localize("min_x(mm): " + getGlobalParameter("operation:surfaceXLow")));
+    writeComment(localize("min_y(mm): " + getGlobalParameter("operation:surfaceYLow")));
+    writeComment(localize("min_b(mm): " + "0"));
+    writeComment(localize("min_z(mm): " + findMinZ()));
+
+    // Writes the feedrate for the tool and the machining when carving
+    if (hasGlobalParameter("operation:tool_feedCutting")) {
+        writeComment(localize("work_speed(mm/minute): " + getGlobalParameter("operation:tool_feedCutting")))
+    } else {
+        writeComment(localize("work_speed(mm/minute): unknown"));
+    }
+    
+    // Writes the feedrate for the tool and the machining when not carving
+    if (hasGlobalParameter("operation:tool_surfaceSpeed")) {
+        writeComment(localize("jog_speed(mm/minute): " + getProperty("retractFeedRate")));
+    } else {
+        writeComment(localize("jog_speed(mm/minute): unknown"));
+    }
+    
+    // Hard coded in to match the work size of the Snapmaker A350T
+    writeComment(localize("work_size_x: " + "320"));
+    writeComment(localize("work_size_y: " + "350"));
+
+
+    //starts snapmaker header
+    writeComment(localize("Header End")); 
+    
+}
+
 // The onOpen function is called at start of each CAM operation and can be used to define settings used in the
 // post processor and output the startup blocks:
 //   1. Define settings based on properties
@@ -356,6 +562,8 @@ function onComment(message) {
 function onOpen() {
 
     // Read properties from post to internal variables
+    prop_writeSnapmakerHeader          = getProperty("writeSnapmakerHeader");
+    prop_writeMachiningTimes           = getProperty("writeMachiningTimes");
     prop_writeWarnings                 = getProperty("writeWarnings");
     prop_writeOperationName            = getProperty("writeOperationName");
     prop_writeProgram                  = getProperty("writeProgram");
@@ -380,6 +588,12 @@ function onOpen() {
     // Read property sequenceNumberStart
     sequenceNumber = prop_sequenceNumberStart;
 
+    // Write snapmaker header info
+    if(prop_writeSnapmakerHeader) {
+        writeSnapmakerHeader();
+        writeln("");
+    }
+    
     // Write program info
     if (prop_writeProgram) {
         writeComment(localize("Program"));
@@ -418,10 +632,21 @@ function onOpen() {
     if (prop_writePost) {
         writeComment(localize("Post-Processor"));
         writeComment(localize(" -> Author") + "      : "  + AUTHOR_NAME);
+        writeComment(localize(" -> Contibutor") + "  : "  + CONTRIBUTOR_NAME);
         writeComment(localize(" -> Version") + "     : "  + POST_VERSION);
         writeComment(localize(" -> Description") + " : "  + longDescription);
     }
-    if (prop_writeExtraComments) writeln("");
+
+    // Writes Estimated Times
+    if(prop_writeMachiningTimes) {
+        writeComment(localize("Estiamted Machining Time"));
+        for (var i = 0; i < totalMachingingTime().sectionCycleTimes.length; i++ ) {
+            writeComment(localize(" -> " + convertSeconds(totalMachingingTime().sectionCycleTimes[i].cycleTime).hours + "h  ") + convertSeconds(totalMachingingTime().sectionCycleTimes[i].cycleTime).minutes + "min  " + convertSeconds(totalMachingingTime().sectionCycleTimes[i].cycleTime).seconds + "sec" + "     : " + "Operation " + totalMachingingTime().sectionCycleTimes[i].operation); 
+        }
+        writeComment(localize(" -> " + convertSeconds(totalMachingingTime().totalCycleTime).hours + "h  ") + convertSeconds(totalMachingingTime().totalCycleTime).minutes + "min  " + convertSeconds(totalMachingingTime().totalCycleTime).seconds + "sec" + "     : " + "Total");
+        writeln("");
+    }
+
 
     // Check unit and process it as on Snapmaker original post
     switch (unit) {
@@ -454,6 +679,8 @@ function onOpen() {
 //   4. Work plane
 //   5. Initial position
 function onSection() {                                         // Start of an operation
+    // specifies that the tool has been retracted to the safe plane
+    var retracted = false;
 
     // Separates this line from the read parameters from the onParameter() function
     if (prop_writeExtraComments) writeln("");
@@ -463,13 +690,15 @@ function onSection() {                                         // Start of an op
         if (hasParameter("operation-comment")) {
             var comment = getParameter("operation-comment");
             if (comment) {
-                writeComment("Operation name: " + comment);
+                writeComment(localize("Operation name: " + comment));
             }
+        }
+        if (hasParameter("operation:tool_description")) {
+            writeComment(localize("Tool name: ") + getParameter("operation:tool_description"));
         }
     }
 
-    // specifies that the tool has been retracted to the safe plane
-    var retracted = false;
+    // tool change not supported
 
     // Forces the output of the linear axes (X, Y, Z) on the next motion block
     forceXYZ();
@@ -481,6 +710,8 @@ function onSection() {                                         // Start of an op
         return;
     }
     setRotation(remaining);
+
+    // coolant not supported
 
     // Forces output on all axes and feedrate on the next motion block
     forceAny();
@@ -495,7 +726,7 @@ function onSection() {                                         // Start of an op
             // Save last Z position (Added by me)
             lastPositionZ = zOutput.format(initialPosition.z);
             // Move to starting position
-            if (prop_writeExtraComments) writeComment(localize("Raize Z axis to safe position"));
+            if (prop_writeExtraComments) writeComment(localize("Raise Z axis to safe position"));
             writeBlock(gMotionModal.format(0), zOutput.format(initialPosition.z));
         }
     }
@@ -638,7 +869,7 @@ function onParameter(param_name, param_value) {
             if (prop_writeExtraComments) writeComment("Manual NC command action \"ACTION_PAUSE_RAISE_Z\" invoked");
                 if (prop_writeExtraComments) writeComment("Raising Z");
                 // Raises Z axix to machine coordinates Z=334mm
-                writeBlock(gMotionModal.format(53), gMotionModal.format(1), zOutput.format(334), feedOutput.format(PAUSE_RAISE_Z_FEED_RATE_UP));
+                writeBlock(gMotionModal.format(53), gMotionModal.format(1), zOutput.format(ACTION_PAUSE_RAISE_Z_POSITION), feedOutput.format(PAUSE_RAISE_Z_FEED_RATE_UP));
                 // Enforces absolute positioning coordinate system
                 writeBlock(gAbsIncModal.format(90));
                 if (prop_writeExtraComments) writeComment("Executing job pause");
@@ -772,6 +1003,7 @@ function onLinear(_x, _y, _z, feed) {
         }
     }
 
+    // previousFeedRate = f;
 }
 
 // The onRapid5D function handles rapid positioning moves (G00) in multi-axis operations. The tool position is
@@ -957,4 +1189,30 @@ function onClose() {
     // output next block
     writeBlock("G4 S" + DWELL_TIME_SPIN_DOWN);
 
+    // Not sure if this a good idea becuase I think it sends the z axis beyond the physical limitations
+    // of the machine. Also not sure if once the file is complete does the machine defaults take over and automatically send the machine to HOME position?
+    if (prop_writeExtraComments) writeComment(localize("Move Z axis " + ACTION_PAUSE_RAISE_Z_POSITION + "mm to top of machine to get it out of the way"));
+    writeBlock(gFormat.format(0), zOutput.format(ACTION_PAUSE_RAISE_Z_POSITION));
+
 }
+
+// -------------------------------------------------------------------------------------------------------------------------------------------------
+// function onClose() {
+//     // --- BUFFERED END G-CODE ---
+    
+//     if (prop_writeExtraComments) writeComment("Wait for moves to finish before running next instruction");
+//     writeBlock(mFormat.format(400));
+    
+//     if (prop_writeExtraComments) writeComment("Stopping spindle");
+//     writeBlock(mFormat.format(5));
+    
+//     if (prop_writeExtraComments) writeComment(localize("Dwell for " + DWELL_TIME_SPIN_DOWN + " seconds to allow the spindle to spin down"));
+//     writeBlock("G4 S" + DWELL_TIME_SPIN_DOWN);
+    
+//     if (prop_writeExtraComments) writeComment(localize("Move Z axis " + ACTION_PAUSE_RAISE_Z_POSITION + "mm to top of machine to get it out of the way"));
+//     writeBlock(gFormat.format(0), zOutput.format(ACTION_PAUSE_RAISE_Z_POSITION));
+
+//     // --- WRITE EVERYTHING TO FILE ---
+//     writeAllOutput();  // This replaces the LINE_COUNT placeholder and outputs all lines
+// }
+// -------------------------------------------------------------------------------------------------------------------------------------------------
