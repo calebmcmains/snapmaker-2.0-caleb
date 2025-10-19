@@ -104,7 +104,7 @@ CALEB-EDITS IS Caleb McMains CHANGES TO TRY AND SOLVE A FEW ISSUE HE WAS HAVING
 {
     POST_VERSION                       = "v20230108.1";
     AUTHOR_NAME                        = "Nuno Vaz Oliveira";
-    CONTRIBUTOR_NAME                   = "Caleb McMains" // [ADDED THIS ONLY SO I COULD DISTINGUISH WHICH POST PROCESS WAS MY EDITS]
+    CONTRIBUTOR_NAME                   = "Caleb McMains";       // [ADDED THIS ONLY SO I COULD DISTINGUISH WHICH POST PROCESS WAS MY EDITS]
 }
 
 // User configuration. Please change only these values on this file
@@ -120,24 +120,24 @@ CALEB-EDITS IS Caleb McMains CHANGES TO TRY AND SOLVE A FEW ISSUE HE WAS HAVING
 
 // Fusion 360 Kernel Settings
 {
-    allowedCircularPlanes              = 0;                                                                // Not supported by Snapmaker 2.0
-    allowHelicalMoves                  = true;                                                             // Supported by Snapmaker 2.0
-    capabilities                       = CAPABILITY_MILLING;                                               // All that Snapmaker 2.0 can handle
-    certificationLevel                 = 2;                                                                // As recommended on Autodesk Post Processor Training Guide
-    description                        = "Snapmaker 2.0 (Marlin) by " + AUTHOR_NAME + " featuring contributions from " + CONTRIBUTOR_NAME;                       // Shows up on Fusion 360 post window, [CHANGED THIS ONLY SO I COULD DISTINGUISH WHICH POST PROCESS WAS MY EDITS]
-    extension                          = ".cnc";                                                           // As exported by Luban
-    setCodePage("ascii");                                                                                  // As recommended on Autodesk Post Processor Training Guide
-    highFeedrate                       = 6000;                                                             // Specifies the high feed mapping mode for rapid moves
-    legal                              = "Copyright (C) 2022 " + AUTHOR_NAME;
-    longDescription                    = "Milling post for Snapmaker 2.0" + POST_VERSION + ", created by " + AUTHOR_NAME;
-    maximumCircularRadius              = spatial(1000, MM);                                                // As recommended on Autodesk Post Processor Training Guide
-    maximumCircularSweep               = toRad(180);                                                       // As recommended on Autodesk Post Processor Training Guide
-    minimumCircularSweep               = toRad(0.01);                                                      // As recommended on Autodesk Post Processor Training Guide
-    minimumChordLength                 = spatial(0.01, MM);                                                // As recommended on Autodesk Post Processor Training Guide
-    minimumCircularRadius              = spatial(0.01, MM);                                                // As recommended on Autodesk Post Processor Training Guide
-    minimumRevision                    = 24000;                                                            // As recommended on Autodesk Post Processor Training Guide
-    tolerance                          = spatial(0.002, MM);                                               // As recommended on Autodesk Post Processor Training Guide
-    vendor                             = "Snapmaker";                                                      // Shows up on Fusion 360 post window
+    allowedCircularPlanes              = 0;                                                                                                                                         // Not supported by Snapmaker 2.0
+    allowHelicalMoves                  = true;                                                                                                                                      // Supported by Snapmaker 2.0
+    capabilities                       = CAPABILITY_MILLING;                                                                                                                        // All that Snapmaker 2.0 can handle
+    certificationLevel                 = 2;                                                                                                                                         // As recommended on Autodesk Post Processor Training Guide
+    description                        = "Snapmaker 2.0 (Marlin) by " + AUTHOR_NAME + " featuring contributions from " + CONTRIBUTOR_NAME;                                          // Shows up on Fusion 360 post window, [CHANGED THIS ONLY SO I COULD DISTINGUISH WHICH POST PROCESS WAS MY EDITS]
+    extension                          = ".cnc";                                                                                                                                    // As exported by Luban
+    setCodePage("ascii");                                                                                                                                                           // As recommended on Autodesk Post Processor Training Guide
+    highFeedrate                       = 6000;                                                                                                                                      // Specifies the high feed mapping mode for rapid moves
+    legal                              = "Copyright (C) 2022 " + AUTHOR_NAME + " featuring contributions from " + CONTRIBUTOR_NAME;
+    longDescription                    = "Milling post for Snapmaker 2.0" + POST_VERSION + ", created by " + AUTHOR_NAME + " featuring contributions from " + CONTRIBUTOR_NAME;
+    maximumCircularRadius              = spatial(1000, MM);                                                                                                                         // As recommended on Autodesk Post Processor Training Guide
+    maximumCircularSweep               = toRad(180);                                                                                                                                // As recommended on Autodesk Post Processor Training Guide
+    minimumCircularSweep               = toRad(0.01);                                                                                                                               // As recommended on Autodesk Post Processor Training Guide
+    minimumChordLength                 = spatial(0.01, MM);                                                                                                                         // As recommended on Autodesk Post Processor Training Guide
+    minimumCircularRadius              = spatial(0.01, MM);                                                                                                                         // As recommended on Autodesk Post Processor Training Guide
+    minimumRevision                    = 24000;                                                                                                                                     // As recommended on Autodesk Post Processor Training Guide
+    tolerance                          = spatial(0.002, MM);                                                                                                                        // As recommended on Autodesk Post Processor Training Guide
+    vendor                             = "Snapmaker";                                                                                                                               // Shows up on Fusion 360 post window
     vendorUrl                          = "http://www.snapmaker.com";
 }
 
@@ -317,6 +317,12 @@ groupDefinitions = {
 
     // This variable will track the last Z position
     var lastPositionZ                  = 9999;
+
+    // -------------------------------------------------------------------------------------------------------------------------------------------------
+    // This variable is a line counter to insert into the final output file, this allows snapmaker to estimate
+    // remaining completion time
+    // var outputLines = []; // buffer all G-code lines
+    // -------------------------------------------------------------------------------------------------------------------------------------------------
 }
 
 // The writeBlock function writes a block of codes to the output NC file. It will add a sequence number to the block,
@@ -333,6 +339,21 @@ function writeBlock() {
     }
 }
 
+// -------------------------------------------------------------------------------------------------------------------------------------------------
+// function writeBlock() {
+//     var line = "";
+
+//     if (prop_showSequenceNumbers) {
+//         line = "N" + sequenceNumber + " " + formatWords(arguments);
+//         sequenceNumber += prop_sequenceNumberIncrement;
+//     } else {
+//         line = formatWords(arguments);
+//     }
+
+//     outputLines.push(line); // buffer the line
+// }
+// -------------------------------------------------------------------------------------------------------------------------------------------------
+
 // formatComment is used to format comments. The formatComment function will remove any characters in the comment
 // that are not allowed, and add any characters that are mandatory. For Snapmakers, a semi-colon at the beginning.
 function formatComment(text) {
@@ -344,6 +365,27 @@ function formatComment(text) {
 function writeComment(text) {
     writeln(formatComment(text));
 }
+// -------------------------------------------------------------------------------------------------------------------------------------------------
+// function writeComment(text) {
+//     outputLines.push(formatComment(text)); // buffer comment
+// }
+
+// Writes everything????
+// function writeAllOutput() {
+//     // Calculate total lines
+//     var totalLines = outputLines.length;
+
+//     // Replace placeholder in header
+//     for (var i = 0; i < outputLines.length; i++) {
+//         outputLines[i] = outputLines[i].replace("LINE_COUNT_PLACEHOLDER", totalLines);
+//     }
+
+//     // Write all lines to the output file
+//     for (var i = 0; i < outputLines.length; i++) {
+//         writeln(outputLines[i]);
+//     }
+// }
+// -------------------------------------------------------------------------------------------------------------------------------------------------
 
 // The onComment function is called when the Manual NC command Comment is issued.
 // It will format and output the text of the comment to the NC file.
@@ -468,7 +510,9 @@ function writeSnapmakerHeader() {
 
     // G-code Flavor
     writeComment(localize("gcode_flavor: marlin"));
-    writeComment(localize("file_total_lines: "));
+
+    // Placeholder for total lines, will be replaced later
+    writeComment(localize("file_total_lines: LINE_COUNT_PLACEHOLDER"));
 
     // Writes the estimated time in seconds for the whole process
     writeComment(localize("estimated_time(s): " + convertSeconds(totalMachingingTime().totalCycleTime).totalSeconds));
@@ -588,6 +632,7 @@ function onOpen() {
     if (prop_writePost) {
         writeComment(localize("Post-Processor"));
         writeComment(localize(" -> Author") + "      : "  + AUTHOR_NAME);
+        writeComment(localize(" -> Contibutor") + "  : "  + CONTRIBUTOR_NAME);
         writeComment(localize(" -> Version") + "     : "  + POST_VERSION);
         writeComment(localize(" -> Description") + " : "  + longDescription);
     }
@@ -1150,3 +1195,24 @@ function onClose() {
     writeBlock(gFormat.format(0), zOutput.format(ACTION_PAUSE_RAISE_Z_POSITION));
 
 }
+
+// -------------------------------------------------------------------------------------------------------------------------------------------------
+// function onClose() {
+//     // --- BUFFERED END G-CODE ---
+    
+//     if (prop_writeExtraComments) writeComment("Wait for moves to finish before running next instruction");
+//     writeBlock(mFormat.format(400));
+    
+//     if (prop_writeExtraComments) writeComment("Stopping spindle");
+//     writeBlock(mFormat.format(5));
+    
+//     if (prop_writeExtraComments) writeComment(localize("Dwell for " + DWELL_TIME_SPIN_DOWN + " seconds to allow the spindle to spin down"));
+//     writeBlock("G4 S" + DWELL_TIME_SPIN_DOWN);
+    
+//     if (prop_writeExtraComments) writeComment(localize("Move Z axis " + ACTION_PAUSE_RAISE_Z_POSITION + "mm to top of machine to get it out of the way"));
+//     writeBlock(gFormat.format(0), zOutput.format(ACTION_PAUSE_RAISE_Z_POSITION));
+
+//     // --- WRITE EVERYTHING TO FILE ---
+//     writeAllOutput();  // This replaces the LINE_COUNT placeholder and outputs all lines
+// }
+// -------------------------------------------------------------------------------------------------------------------------------------------------
